@@ -9,7 +9,15 @@ declare module 'knex/types/tables' {
       description: string
       is_on_diet: boolean
       created_at: string
-      session_id?: string
+      updated_at: string
+    }
+    users: {
+      id: string
+      session_id: string
+      name: string
+      email: string
+      created_at: string
+      updated_at: string
     }
   }
 }
