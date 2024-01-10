@@ -1,14 +1,14 @@
 # Requisitos da aplicação
 
 - [x] Deve ser possível criar um usuário;
-- [ ] Deve ser possível identificar o usuário entre as requisições;
+- [x] Deve ser possível identificar o usuário entre as requisições;
 - [x] Deve ser possível registrar uma refeição feita, com as seguintes informações:
     - Nome
     - Descrição
     - Data e Hora
     - Está dentro ou não da dieta
-- [ ] As refeições devem ser relacionadas a um usuário;
-- [ ] Deve ser possível editar uma refeição, podendo alterar todos os dados acima;
+- [x] As refeições devem ser relacionadas a um usuário;
+- [x] Deve ser possível editar uma refeição, podendo alterar todos os dados acima;
 - [x] Deve ser possível apagar uma refeição;
 - [ ] Deve ser possível listar todas as refeições de um usuário;
 - [x] Deve ser possível visualizar uma única refeição;
