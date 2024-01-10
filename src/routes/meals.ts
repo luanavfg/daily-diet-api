@@ -72,16 +72,20 @@ export async function mealsRoutes(app: FastifyInstance) {
       preHandler: [checkSessionIdExists],
     },
     async (request, reply) => {
+      const paramsSchema = z.object({ mealId: z.string().uuid() })
+      const { mealId } = paramsSchema.parse(request.params)
+
       const updateMealBodySchema = z.object({
-        mealId: z.string().uuid(),
+        // mealId: z.string().uuid(),
         name: z.string().optional(),
         description: z.string().optional(),
         isOnDiet: z.boolean().optional(),
-        updatedAt: z.coerce.date(),
+        // date: z.coerce.date(),
       })
 
-      const { name, description, isOnDiet, mealId, updatedAt } =
-        updateMealBodySchema.parse(request.params)
+      const { name, description, isOnDiet } = updateMealBodySchema.parse(
+        request.params,
+      )
 
       const meal = await knex('meals').where('id', mealId).first()
 
@@ -93,7 +97,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         name,
         description,
         is_on_diet: isOnDiet,
-        updated_at: updatedAt.toISOString(),
+        updated_at: new Date().toISOString(),
       })
 
       return reply.status(204).send({
@@ -102,21 +106,27 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   )
 
-  app.delete('/:mealId', async (request, reply) => {
-    const deleteMealBodySchema = z.object({
-      mealId: z.string().uuid(),
-    })
+  app.delete(
+    '/:mealId',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request, reply) => {
+      const deleteMealBodySchema = z.object({
+        mealId: z.string().uuid(),
+      })
 
-    const { mealId } = deleteMealBodySchema.parse(request.params)
-    const meal = await knex('meals').where('id', mealId).first()
+      const { mealId } = deleteMealBodySchema.parse(request.params)
+      const meal = await knex('meals').where('id', mealId).first()
 
-    if (!meal) {
-      return reply.status(404).send({ error: 'Meal not found' })
-    }
-    await knex('meals').where('id', mealId).del()
+      if (!meal) {
+        return reply.status(404).send({ error: 'Meal not found' })
+      }
+      await knex('meals').where('id', mealId).del()
 
-    return reply.status(200).send({
-      message: 'Meal successfully deleted',
-    })
-  })
+      return reply.status(200).send({
+        message: 'Meal successfully deleted',
+      })
+    },
+  )
 }
