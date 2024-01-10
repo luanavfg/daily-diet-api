@@ -38,8 +38,8 @@ export async function mealsRoutes(app: FastifyInstance) {
     {
       preHandler: [checkSessionIdExists],
     },
-    async () => {
-      const meals = await knex('meals').select()
+    async (request) => {
+      const meals = await knex('meals').where({ user_id: request.user?.id })
 
       return { meals }
     },
@@ -56,7 +56,10 @@ export async function mealsRoutes(app: FastifyInstance) {
       })
 
       const { mealId } = getMealBodySchema.parse(request.params)
-      const meal = await knex('meals').where('id', mealId).first()
+      const meal = await knex('meals')
+        .where('id', mealId)
+        .andWhere('user_id', request.user?.id)
+        .first()
 
       if (!meal) {
         return reply.status(404).send({ error: 'Meal not found' })
@@ -85,7 +88,10 @@ export async function mealsRoutes(app: FastifyInstance) {
         request.body,
       )
 
-      const meal = await knex('meals').where('id', mealId).first()
+      const meal = await knex('meals')
+        .where('id', mealId)
+        .andWhere('user_id', request.user?.id)
+        .first()
 
       if (!meal) {
         return reply.status(404).send({ error: 'Meal not found' })
@@ -115,7 +121,10 @@ export async function mealsRoutes(app: FastifyInstance) {
       })
 
       const { mealId } = deleteMealBodySchema.parse(request.params)
-      const meal = await knex('meals').where('id', mealId).first()
+      const meal = await knex('meals')
+        .where('id', mealId)
+        .andWhere('user_id', request.user?.id)
+        .first()
 
       if (!meal) {
         return reply.status(404).send({ error: 'Meal not found' })
