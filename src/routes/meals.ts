@@ -29,7 +29,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         user_id: request.user?.id,
       })
 
-      return reply.status(201).send()
+      return reply.status(200).send()
     },
   )
 
@@ -181,7 +181,7 @@ export async function mealsRoutes(app: FastifyInstance) {
       }
       await knex('meals').where('id', mealId).del()
 
-      return reply.status(200).send({
+      return reply.status(204).send({
         message: 'Meal successfully deleted',
       })
     },
