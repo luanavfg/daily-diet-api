@@ -40,7 +40,6 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
     async (request) => {
       const meals = await knex('meals').where({ user_id: request.user?.id })
-
       return { meals }
     },
   )
@@ -66,6 +65,57 @@ export async function mealsRoutes(app: FastifyInstance) {
       }
 
       return { meal }
+    },
+  )
+
+  app.get(
+    '/metrics',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request) => {
+      // total meals
+      const meals = await knex('meals').where('user_id', request.user?.id)
+      const totalMeals = meals.length
+
+      // meals in diet
+      const mealsInDiet = await knex('meals').where({
+        user_id: request.user?.id,
+        is_on_diet: true,
+      })
+      const numberOfMealsInDiet = mealsInDiet.length
+
+      // meals out of diet
+      const mealsOutOfDiet = await knex('meals').where({
+        user_id: request.user?.id,
+        is_on_diet: false,
+      })
+      const numberOfMealsOutOfDiet = mealsOutOfDiet.length
+
+      // best in diet sequence
+      const { mealsInDietBestSequence } = meals.reduce(
+        (acc, meal) => {
+          if (meal.is_on_diet) {
+            acc.currentSequence += 1
+          } else {
+            acc.currentSequence = 0
+          }
+
+          if (acc.currentSequence > acc.mealsInDietBestSequence) {
+            acc.mealsInDietBestSequence = acc.currentSequence
+          }
+
+          return acc
+        },
+        { mealsInDietBestSequence: 0, currentSequence: 0 },
+      )
+
+      return {
+        totalMeals,
+        numberOfMealsInDiet,
+        numberOfMealsOutOfDiet,
+        mealsInDietBestSequence,
+      }
     },
   )
 
